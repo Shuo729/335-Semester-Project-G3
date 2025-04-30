@@ -1,4 +1,7 @@
 def rabin_karp(text, pattern, q=101):
+    """
+    Rabin-Karp algorithm for substring search.
+    """
     d = 256
     m = len(pattern)
     n = len(text)

@@ -1,4 +1,7 @@
 def naive_search(text, pattern):
+    """
+    Naive string matching algorithm to find all occurrences of a pattern in a text.
+    """
     positions = []
     n = len(text)
     m = len(pattern)

@@ -1,4 +1,7 @@
 def compute_lps(pattern):
+    """
+    Compute the longest prefix which is also a suffix (LPS) array for KMP algorithm.
+    """
     m = len(pattern)
     lps = [0] * m
     length = 0
@@ -18,6 +21,9 @@ def compute_lps(pattern):
     return lps
 
 def kmp_search(text, pattern):
+    """
+    KMP algorithm for finding all occurrences of a pattern in a text.
+    """
     n = len(text)
     m = len(pattern)
     lps = compute_lps(pattern)
