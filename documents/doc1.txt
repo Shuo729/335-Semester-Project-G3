@@ -1,8 +1,16 @@
 Title: Understanding Ocean Ecosystems  
 Author: Laura Evans
 
-Oceans cover more than 70% of the Earth's surface and are home to diverse marine ecosystems. These ecosystems are essential to life on our planet, providing food, oxygen, and climate regulation. One of the most fragile environments is the coral reef system.
+Oceans cover more than 70% of the Earth's surface and are home to diverse marine ecosystems. These ecosystems are essential to life on our planet, providing food, oxygen, and climate regulation (Johnson 103). One of the most fragile environments is the coral reef system.
 Overfishing, pollution, and climate change threaten these delicate ecosystems. As ocean temperatures rise, coral bleaching becomes more frequent, endangering biodiversity. Scientists have concluded that preserving marine biodiversity is crucial for planetary health.
-Protecting our oceans is a global responsibility. Policies must be developed to limit harmful industrial practices. Encouraging local communities to take part in marine conservation efforts can create long-term positive change.
-By implementing better fishing regulations and reducing plastic waste, we can begin to reverse some of the damage done. Public awareness and education are also key to inspiring sustainable behavior.
+Protecting our oceans is a global responsibility. Policies must be developed to limit harmful industrial practices. Encouraging local communities to take part in marine conservation efforts can create long-term positive change (Patel 90).
+By implementing better fishing regulations and reducing plastic waste, we can begin to reverse some of the damage done (Nguyen 146). Public awareness and education are also key to inspiring sustainable behavior.
 Marine scientists around the world continue to study ocean life, seeking to understand the interdependence of species and the importance of preserving ecosystems for generations to come.
+
+Works Cited
+
+Johnson, Emily. "The Future of Coral Reefs in a Changing Climate". Marine Science Press, 2019.
+
+Nguyen, Michael T. “Plastic Pollution and Marine Life: A Global Perspective.” Journal of Oceanic Research, vol. 12, no. 3, 2020, pp. 145–162.
+
+Patel, Ayesha. “Community-Driven Conservation in Coastal Regions.” Environmental Policy Review, vol. 18, no. 2, 2021, pp. 88–105.

@@ -1,6 +1,7 @@
 from string_matching.rabin_karp import rabin_karp
 from string_matching.kmp import kmp_search
 from string_matching.naive_search import naive_search
+import re
 
 def detect_duplicate_phrases(text, pattern):
     """
@@ -18,35 +19,47 @@ def realtime_keyword_search(text, pattern):
     """
     return naive_search(text, pattern)
 
+def strip_after_references(text):
+    """
+    Cut the text off at "References" or "Works Cited" to exclude bibliography.
+    """
+    ref_match = re.search(r'\b(References|Works Cited)\b', text, re.IGNORECASE)
+    return text[:ref_match.start()] if ref_match else text
+
+def clean_phrase(phrase):
+    """
+    Remove parentheses from the phrase for cleaner comparison.
+    """
+    return re.sub(r'\([^)]*\)', '', phrase).strip()
+
 def detect_plagiarized_phrases(doc1_text, doc2_text, phrase_length=5):
     """
     Detect matching phrases between two documents by splitting into small phrases
     and checking if they exist across documents.
+    Ignoring citations and references.
     """
     matches = []
+    doc1_main = strip_after_references(doc1_text)
+    doc2_main = strip_after_references(doc2_text)
+    
     doc1_words = doc1_text.split()
 
     for i in range(len(doc1_words) - phrase_length + 1):
         phrase = " ".join(doc1_words[i:i + phrase_length])
+        cleaned = clean_phrase(phrase) # Clean the phrase for comparison
 
-        # Skip likely citations
-        if "(" in phrase and ")" in phrase and "." in phrase:
+        if len(cleaned.split()) < 3:  # Skip very short cleaned phrases
             continue
 
-        # Only skip short phrases if phrase_length >= 5
-        if phrase_length >= 5 and len(phrase.split()) < 5:
+        if any(m['phrase'] == cleaned for m in matches):
             continue
 
-        # Avoid duplicates
-        if any(m['phrase'] == phrase for m in matches):
-            continue
-
-        result = detect_duplicate_phrases(doc2_text, phrase)
+        result = detect_duplicate_phrases(doc2_main, cleaned)
         if any(result[algo] for algo in result):
             match_info = {
-                "phrase": phrase,
-                "doc1_pos": doc1_text.find(phrase),
-                "doc2_pos": doc2_text.find(phrase)
+                "phrase": cleaned,
+                "doc1_pos": doc1_text.find(cleaned),
+                "doc2_pos": doc2_text.find(cleaned)
             }
             matches.append(match_info)
 
@@ -54,37 +67,27 @@ def detect_plagiarized_phrases(doc1_text, doc2_text, phrase_length=5):
 
 def merge_overlapping_phrases(plagiarized_phrases, doc1, doc2):
     """
-    Merge overlapping plagiarized phrases for clearer output.
+    Merge overlapping/adjacent phrases for cleaner visualization.
     """
-    merged_phrases = []
-    i = 0
-    while i < len(plagiarized_phrases):
-        current_phrase = plagiarized_phrases[i]
-        # Check if this phrase has an overlap with the next phrase
-        merged_phrase = current_phrase['phrase']
-        doc1_pos = current_phrase['doc1_pos']
-        doc2_pos = current_phrase['doc2_pos']
+    if not plagiarized_phrases:
+        return []
 
-        # Look ahead for overlap with the next phrase
-        while i + 1 < len(plagiarized_phrases):
-            next_phrase = plagiarized_phrases[i + 1]
-            # If the current and next phrases overlap (i.e., last part of current, first part of next)
-            if merged_phrase.split()[-(len(next_phrase['phrase'].split()) - 1):] == next_phrase['phrase'].split()[:-1]:
-                # Merge the phrases
-                merged_phrase = merged_phrase + " " + next_phrase['phrase'].split()[-1]
-                doc1_pos = min(doc1_pos, next_phrase['doc1_pos'])  # Adjust the position
-                doc2_pos = min(doc2_pos, next_phrase['doc2_pos'])  # Adjust the position
-                i += 1  # Move to the next phrase
-            else:
-                break
-        
-        # Now check if the merged phrase is exactly the same in both documents
-        if merged_phrase in doc1 and merged_phrase in doc2:
-            merged_phrases.append({
-                'phrase': merged_phrase,
-                'doc1_pos': doc1_pos,
-                'doc2_pos': doc2_pos
-            })
-        i += 1
+    plagiarized_phrases.sort(key=lambda x: x['doc1_pos'])
 
-    return merged_phrases
+    merged = []
+    current = plagiarized_phrases[0]
+
+    for next_phrase in plagiarized_phrases[1:]:
+        curr_end = current['doc1_pos'] + len(current['phrase'])
+        next_start = next_phrase['doc1_pos']
+
+        if next_start <= curr_end + 1:
+            # Extend current phrase
+            end = max(curr_end, next_start + len(next_phrase['phrase']))
+            current['phrase'] = doc1[current['doc1_pos']:end]
+        else:
+            merged.append(current)
+            current = next_phrase
+
+    merged.append(current)
+    return merged
