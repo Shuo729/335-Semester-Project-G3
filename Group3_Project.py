@@ -1,26 +1,25 @@
 # Main Program
 import os
-from string_matching import str_matcher
+from string_matching.str_matcher import detect_plagiarized_phrases, merge_overlapping_phrases
 from compression.huffman_encoding import compress_phrases
 
-# Huffman encoding and compression
-def display_and_compress(results):
-    for result in results:
-        doc1, doc2 = result['pair'] 
-        matches = [match[0] for match in result['matches']]
-        print(f"\n[Match] Between {doc1} and {doc2}:")
-        for phrase, method in result['matches']:
-            print(f"  - {phrase} (via {method})")
- 
- # If any matches were found, proceed to compress them using Huffman coding
-        if matches:
-            codes, encoded = compress_phrases(matches)
-            print(f"[Compression] Huffman Codes: {codes}")
-            print(f"[Compression] Encoded Matches: {encoded}")
+# Display and compress results
+def display_and_compress(doc1_name, doc2_name, matches):
+    print(f"\n[Match] Between {doc1_name} and {doc2_name}:")
+    for match in matches:
+        print(f"  - Phrase: \"{match['phrase']}\"")
+        print(f"    Found in: {doc1_name} at {match['doc1_pos']}, {doc2_name} at {match['doc2_pos']}")
 
-# Load documents from a folder
+    # If any matches were found, proceed to compress them using Huffman coding
+    if matches:
+        phrases = [match['phrase'] for match in matches]
+        codes, encoded = compress_phrases(phrases)
+        print(f"[Compression] Huffman Codes: {codes}")
+        print(f"[Compression] Encoded Matches: {encoded}")
+
+# Load all .txt files from the documents folder
 def load_documents_from_folder(folder_path="documents"):
-    if not os.path.exists(folder_path):  # Check if folder exists
+    if not os.path.exists(folder_path):
         print(f"Error: Folder '{folder_path}' not found!")
         return {}
     
@@ -33,9 +32,22 @@ def load_documents_from_folder(folder_path="documents"):
 
 # Function to load files, detect plagiarism, and compress results
 def main():
-    text = load_documents_from_folder()
-    detected_results = str_matcher.detect_duplicate_phrases(text)
-    display_and_compress(detected_results)
+    documents = load_documents_from_folder()
+    doc_names = list(documents.keys())
+
+    for i in range(len(doc_names)):
+        for j in range(i + 1, len(doc_names)):
+            doc1_name = doc_names[i]
+            doc2_name = doc_names[j]
+            doc1_text = documents[doc1_name]
+            doc2_text = documents[doc2_name]
+            # Detect plagiarized phrases of length 7
+            raw_matches = detect_plagiarized_phrases(doc1_text, doc2_text, phrase_length=7)
+            # Merge overlapping phrases
+            merged_matches = merge_overlapping_phrases(raw_matches, doc1_text, doc2_text)
+
+            if merged_matches: # If there are any matches, display and compress them
+                display_and_compress(doc1_name, doc2_name, merged_matches)
 
 if __name__ == "__main__":
     main()
