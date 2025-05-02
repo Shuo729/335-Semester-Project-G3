@@ -2,6 +2,7 @@
 import os
 from string_matching.str_matcher import detect_plagiarized_phrases, merge_overlapping_phrases
 from compression.huffman_encoding import compress_phrases
+from sorting import merge_sort
 
 # Display and compress results
 def display_and_compress(doc1_name, doc2_name, matches):
@@ -48,6 +49,25 @@ def main():
 
             if merged_matches: # If there are any matches, display and compress them
                 display_and_compress(doc1_name, doc2_name, merged_matches)
+
+# Main function to execute document sorting
+def main():
+    documents = load_documents_from_folder()
+
+    # Ask the user how they want to sort the documents
+    print("Sort documents by:")
+    print("1. Title")
+    print("2. Author")
+    print("3. Date")
+    sort_choice = int(input("Enter your choice (1-3): "))
+    
+    key_index = sort_choice - 1
+    merge_sort(documents, key_index)
+
+    # Display the sorted documents
+    print("\nDocuments sorted:")
+    for document in documents:
+        print(f"Title: {document[0]}, Author: {document[1]}, Date: {document[2]}")
 
 if __name__ == "__main__":
     main()
