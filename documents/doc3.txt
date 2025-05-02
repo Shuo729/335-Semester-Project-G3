@@ -1,0 +1,24 @@
+Title: AI in Modern Healthcare  
+Author: Dr. Sarah Kumar
+
+Artificial intelligence is reshaping modern healthcare by improving diagnostics, treatment planning, and patient outcomes. Machine learning algorithms can now analyze medical images with accuracy rivaling trained radiologists (Robinson 56). These tools are particularly useful in early cancer detection, where subtle anomalies might be missed by human eyes.
+Natural language processing (NLP) is another transformative application. NLP systems can extract insights from unstructured clinical notes, electronic health records, and research papers. This accelerates drug discovery and improves decision-making for physicians. For example, AI models can identify patterns in patient histories that suggest undiagnosed chronic conditions.
+AI-powered virtual assistants are gaining traction in patient care. These systems provide 24/7 support for symptom checking and basic triage, reducing the burden on healthcare workers. However, rigorous validation is required to ensure safety and avoid misdiagnosis (Patel 90). Regulatory frameworks are evolving to keep pace with these innovations.
+Predictive analytics, powered by AI, helps hospitals forecast disease outbreaks and optimize staffing. By analyzing historical and real-time data, institutions can anticipate surges in patient admissions and allocate resources accordingly (Nguyen 146). This capability proved vital during the recent global health crises.
+One of the most promising applications lies in personalized medicine. AI can tailor treatment plans based on a patient’s genetic profile, lifestyle, and medical history. This approach is already yielding better outcomes in oncology, where targeted therapies are replacing one-size-fits-all treatments.
+Despite its potential, AI in healthcare raises ethical concerns. Ensuring algorithmic fairness, transparency, and patient privacy remains critical. Biases in training data can lead to disparities in diagnosis and treatment, especially for underrepresented populations. Ongoing research focuses on building inclusive and explainable AI models (Kumar 33).
+Environmental monitoring systems powered by AI are also being integrated into hospital infrastructure. These tools track energy usage, waste production, and supply chain logistics to reduce the carbon footprint of healthcare facilities (Thompson 112).
+The integration of artificial intelligence into medicine is accelerating at an unprecedented pace. From diagnostics to drug development, AI is becoming an essential tool for clinicians (Robinson 56). In cardiology, for instance, machine learning models can detect irregular heart rhythms from wearable devices in real-time.
+AI-driven radiology tools are now capable of analyzing X-rays, MRIs, and CT scans with high accuracy. These systems assist radiologists by flagging potential issues, allowing them to focus on complex cases (Thompson 112).
+
+Works Cited
+
+Nguyen, Michael T. “Plastic Pollution and Marine Life: A Global Perspective.” Journal of Oceanic Research, vol. 12, no. 3, 2020, pp. 145–162.
+
+Robinson, David. "Sustainable Futures: Renewable Energy in the 21st Century." GreenTech Press, 2019.
+
+Thompson, Robert. “Wind Power and Wildlife: Finding a Balance.” Environmental Science Review, vol. 14, no. 4, 2020, pp. 110–125.
+
+Kumar, Sarah. “AI Ethics in Medical Practice.” Journal of Digital Health, vol. 5, no. 2, 2022, pp. 33–50.
+
+Davis, James. “AI and Predictive Diagnostics in Oncology.” Clinical AI Review, vol. 6, no. 4, 2023, pp. 130–145.

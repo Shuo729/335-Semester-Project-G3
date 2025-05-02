@@ -1,10 +1,10 @@
 from string_matching.str_matcher import detect_duplicate_phrases, realtime_keyword_search, detect_plagiarized_phrases, merge_overlapping_phrases
 
 # Read documents for testing
-with open("documents/doc1.txt", "r", encoding="utf-8") as f:
+with open("documents/doc5.txt", "r", encoding="utf-8") as f:
     doc1 = f.read()
 
-with open("documents/doc2.txt", "r", encoding="utf-8") as f:
+with open("documents/doc6.txt", "r", encoding="utf-8") as f:
     doc2 = f.read()
 
 # Test 1: Detect duplicate phrases between two documents
