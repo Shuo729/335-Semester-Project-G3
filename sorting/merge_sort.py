@@ -1,7 +1,11 @@
-import time
+from utils import extract_metadata
+import os
 
-# Merge Sort function for sorting documents by a specified field (author, title, date)
 def merge_sort(documents, key_index):
+    """
+    Sorts the documents list in place using merge sort algorithm based on the key_index.
+    key_index: 0 for title, 1 for author, or 2 for date.
+    """
     if len(documents) > 1:
         mid = len(documents) // 2  # Find the middle index
         left_half = documents[:mid]  # Divide list into left half
@@ -35,16 +39,16 @@ def merge_sort(documents, key_index):
             j += 1
             k += 1
 
-# Take user input for document details (author, title, date)
-def load_documents():
-    num_documents = int(input("Enter number of documents: "))
-    documents = []
-
-    for _ in range(num_documents):
-        title = input("Enter document title: ")
-        author = input("Enter author name: ")
-        date = input("Enter publication date (YYYY-MM-DD): ")
-
-        documents.append((title, author, date))  # Store as tuple (title, author, date)
-
-    return documents
+def load_documents(folder="documents"):
+    """
+    Loads all .txt files from the folder and extracts metadata.
+    Returns list of (title, author, date) tuples.
+    """
+    docs = []
+    # Iterate through all files in the specified folder
+    for filename in os.listdir(folder):
+        if filename.endswith(".txt"):
+            path = os.path.join(folder, filename)
+            title, author, date = extract_metadata(path)
+            docs.append((title, author, date))
+    return docs

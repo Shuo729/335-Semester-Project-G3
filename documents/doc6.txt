@@ -1,5 +1,6 @@
 Title: Smart Cities and Climate-Resilient Infrastructure  
 Author: Prof. Kevin Tran
+Date: 2012-09-09
 
 Urbanization continues to reshape the global landscape, with over half the world’s population now living in cities. Sustainable urban development requires balancing economic growth with environmental protection (Green 205). As climate change intensifies, cities must adopt resilient infrastructure to withstand extreme weather events and rising sea levels
 Smart city technologies play a pivotal role in this transition. IoT-enabled systems monitor water usage, energy consumption, and traffic patterns to reduce urban footprints (Nguyen 67). For example, Amsterdam’s smart grid dynamically adjusts electricity distribution based on demand, cutting waste and lowering emissions.

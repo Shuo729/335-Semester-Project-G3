@@ -1,5 +1,6 @@
 Title: AI in Modern Healthcare  
 Author: Dr. Sarah Kumar
+Date: 2023-10-03
 
 Artificial intelligence is reshaping modern healthcare by improving diagnostics, treatment planning, and patient outcomes. Machine learning algorithms can now analyze medical images with accuracy rivaling trained radiologists (Robinson 56). These tools are particularly useful in early cancer detection, where subtle anomalies might be missed by human eyes.
 Natural language processing (NLP) is another transformative application. NLP systems can extract insights from unstructured clinical notes, electronic health records, and research papers. This accelerates drug discovery and improves decision-making for physicians. For example, AI models can identify patterns in patient histories that suggest undiagnosed chronic conditions.

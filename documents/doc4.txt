@@ -1,5 +1,6 @@
 Title: The Future of AI in Medicine  
 Author: James Davis
+Date: 2023-02-17
 
 The integration of artificial intelligence into medicine is accelerating at an unprecedented pace. From diagnostics to drug development, AI is becoming an essential tool for clinicians (Robinson 56). In cardiology, for instance, machine learning models can detect irregular heart rhythms from wearable devices in real-time.
 AI-driven radiology tools are now capable of analyzing X-rays, MRIs, and CT scans with high accuracy. These systems assist radiologists by flagging potential issues, allowing them to focus on complex cases (Thompson 112). However, widespread adoption requires addressing challenges related to data privacy and regulatory approval.
