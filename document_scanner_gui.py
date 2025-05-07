@@ -115,7 +115,10 @@ class DocumentScannerGUI:
             return
 
         self.plag_results_text.delete('1.0', tk.END)
-        self.plag_results_text.insert(tk.END, f"Analyzing plagiarism between:\nDoc 1: {os.path.basename(doc1_path)}\nDoc 2: {os.path.basename(doc2_path)}\n\n")
+        # Configure a tag for highlighting
+        self.plag_results_text.tag_configure("highlight", background="yellow", foreground="black")
+
+        self.plag_results_text.insert(tk.END, f"Analyzing plagiarism between:\nDoc 1: {os.path.basename(doc1_path)}\nDoc 2: {os.path.basename(doc2_path)}\nWith minimum phrase length: {phrase_length}\n\n")
 
         raw_matches = detect_plagiarized_phrases(doc1_text, doc2_text, phrase_length=phrase_length)
         merged_matches = merge_overlapping_phrases(raw_matches, doc1_text, doc2_text)
@@ -124,14 +127,85 @@ class DocumentScannerGUI:
             self.plag_results_text.insert(tk.END, "No significant matching phrases found.\n")
             return
 
-        self.plag_results_text.insert(tk.END, f"Found {len(merged_matches)} matching phrase(s):\n")
+        self.plag_results_text.insert(tk.END, f"Found {len(merged_matches)} matching phrase(s):\n\n")
         match_phrases_for_compression = []
-        for i, match in enumerate(merged_matches):
-            self.plag_results_text.insert(tk.END, f"  Match {i+1}:\n")
-            self.plag_results_text.insert(tk.END, f"    Phrase: \"{match['phrase']}\"\n")
-            self.plag_results_text.insert(tk.END, f"    In {os.path.basename(doc1_path)} at index: {match['doc1_pos']}\n")
-            self.plag_results_text.insert(tk.END, f"    In {os.path.basename(doc2_path)} at index: {match['doc2_pos']}\n\n")
-            match_phrases_for_compression.append(match['phrase'])
+        
+        CONTEXT_CHARS = 60 # Number of characters for context on each side
+
+        for i, match_info in enumerate(merged_matches):
+            # phrase_from_doc1 is the actual merged text segment from document 1
+            phrase_from_doc1 = match_info['phrase']
+            len_phrase_from_doc1 = len(phrase_from_doc1)
+            
+            doc1_match_start_actual = match_info['doc1_pos']
+            # doc2_match_start_original is the start of the *first cleaned sub-phrase* in doc2
+            # that contributed to this merged phrase from doc1.
+            doc2_match_start_original = match_info['doc2_pos']
+
+            self.plag_results_text.insert(tk.END, f"Match {i+1}:\n")
+            # The "detected phrase" is the segment from doc1
+            self.plag_results_text.insert(tk.END, f"  Detected phrase (from {os.path.basename(doc1_path)}):\n    \"", "bold") # Make title bold
+            self.plag_results_text.insert(tk.END, phrase_from_doc1)
+            self.plag_results_text.insert(tk.END, "\"\n\n")
+
+
+            # --- Display context from Document 1 ---
+            self.plag_results_text.insert(tk.END, f"  In {os.path.basename(doc1_path)}:\n    ")
+            
+            context_start1 = max(0, doc1_match_start_actual - CONTEXT_CHARS)
+            # Text before the highlight in doc1
+            prefix_text1 = doc1_text[context_start1:doc1_match_start_actual]
+            if context_start1 > 0:
+                prefix_text1 = "..." + prefix_text1
+            
+            # Text after the highlight in doc1
+            context_end1_after_phrase = doc1_match_start_actual + len_phrase_from_doc1
+            context_end1_display = min(len(doc1_text), context_end1_after_phrase + CONTEXT_CHARS)
+            suffix_text1 = doc1_text[context_end1_after_phrase : context_end1_display]
+            if context_end1_display < len(doc1_text):
+                suffix_text1 = suffix_text1 + "..."
+
+            # Insert into text widget for doc1
+            self.plag_results_text.insert(tk.END, prefix_text1)
+            tag_start_idx1 = self.plag_results_text.index(tk.INSERT) # Get current position
+            self.plag_results_text.insert(tk.END, phrase_from_doc1) # Insert the phrase from doc1
+            tag_end_idx1 = self.plag_results_text.index(tk.INSERT)   # Get position after insertion
+            self.plag_results_text.tag_add("highlight", tag_start_idx1, tag_end_idx1)
+            self.plag_results_text.insert(tk.END, suffix_text1 + "\n\n")
+
+            # --- Display context from Document 2 ---
+            # We will highlight the segment in doc2 that corresponds in position and length
+            # to the phrase_from_doc1, starting at doc2_match_start_original.
+            self.plag_results_text.insert(tk.END, f"  Corresponds in {os.path.basename(doc2_path)} (original match at index {doc2_match_start_original}):\n    ")
+            
+            # The text from doc2 that we intend to highlight. Its length is len_phrase_from_doc1.
+            # Ensure we don't go out of bounds for doc2_text.
+            doc2_highlight_end = min(len(doc2_text), doc2_match_start_original + len_phrase_from_doc1)
+            highlight_text_in_doc2 = doc2_text[doc2_match_start_original : doc2_highlight_end]
+            
+            context_start2 = max(0, doc2_match_start_original - CONTEXT_CHARS)
+            # Text before the highlight in doc2
+            prefix_text2 = doc2_text[context_start2:doc2_match_start_original]
+            if context_start2 > 0:
+                prefix_text2 = "..." + prefix_text2
+            
+            # Text after the highlight in doc2
+            # The end of the actual highlighted part in doc2 is doc2_match_start_original + len(highlight_text_in_doc2)
+            context_end2_after_phrase = doc2_match_start_original + len(highlight_text_in_doc2)
+            context_end2_display = min(len(doc2_text), context_end2_after_phrase + CONTEXT_CHARS)
+            suffix_text2 = doc2_text[context_end2_after_phrase : context_end2_display]
+            if context_end2_display < len(doc2_text):
+                suffix_text2 = suffix_text2 + "..."
+
+            # Insert into text widget for doc2
+            self.plag_results_text.insert(tk.END, prefix_text2)
+            tag_start_idx2 = self.plag_results_text.index(tk.INSERT)
+            self.plag_results_text.insert(tk.END, highlight_text_in_doc2) # Insert the actual text from doc2
+            tag_end_idx2 = self.plag_results_text.index(tk.INSERT)
+            self.plag_results_text.tag_add("highlight", tag_start_idx2, tag_end_idx2)
+            self.plag_results_text.insert(tk.END, suffix_text2 + "\n\n")
+            
+            match_phrases_for_compression.append(phrase_from_doc1) # Use phrase from doc1 for compression
         
         self.plag_results_text.insert(tk.END, "\n--- Compression of Matched Phrases ---\n")
         if match_phrases_for_compression:
