@@ -1,4 +1,4 @@
-from utils import extract_metadata
+from .utils import extract_metadata
 import os
 
 def merge_sort(documents, key_index):
