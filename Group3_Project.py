@@ -19,8 +19,12 @@ class DocumentScannerGUI:
     def __init__(self, master):
         self.master = master
         master.title("CSUF Document Scanner & Pattern Extractor")
-        master.geometry("800x600")
-
+        
+        # Set size and center the main window
+        WINDOW_WIDTH = 800
+        WINDOW_HEIGHT = 600
+        self.center_window(master, WINDOW_WIDTH, WINDOW_HEIGHT)
+        
         self.notebook = ttk.Notebook(master)
         self.notebook.pack(expand=True, fill='both', padx=10, pady=10)
 
@@ -39,6 +43,11 @@ class DocumentScannerGUI:
         self.graph_tab = ttk.Frame(self.notebook)
         self.notebook.add(self.graph_tab, text='Citation Graph Analysis')
         self.setup_graph_tab(self.graph_tab)
+        
+        # Tab 4: Document Optimization (Uses greedy prioritization)
+        self.optimization_tab = ttk.Frame(self.notebook)
+        self.notebook.add(self.optimization_tab, text='Optimization')
+        self.setup_optimization_tab(self.optimization_tab)
 
     def browse_file(self, entry_widget):
         file_path = filedialog.askopenfilename(
@@ -49,6 +58,16 @@ class DocumentScannerGUI:
         if file_path:
             entry_widget.delete(0, tk.END)
             entry_widget.insert(0, file_path)
+
+    # Center the window on the screen
+    def center_window(self, window, width, height):
+        screen_width = window.winfo_screenwidth()
+        screen_height = window.winfo_screenheight()
+
+        x = (screen_width // 2) - (width // 2)
+        y = (screen_height // 2) - (height // 2)
+
+        window.geometry(f"{width}x{height}+{x}+{y}")
 
     # --- Plagiarism & Compression Tab ---
     def setup_plagiarism_tab(self, tab):
@@ -406,6 +425,83 @@ class DocumentScannerGUI:
         self.graph_results_text.insert(tk.END, "\nGraph visualization should have popped up in a new window.\n")
         messagebox.showinfo("Graph Visualization", "Graph visualization (if any nodes/edges) should have appeared in a separate Matplotlib window.")
 
+    def setup_optimization_tab(self, tab):
+        frame = ttk.Frame(tab, padding="10")
+        frame.pack(expand=True, fill='both')
+
+        # Button to run optimization
+        self.optimize_button = ttk.Button(frame, text="Prioritize Most Relevant Documents", command=self.run_greedy_optimization)
+        self.optimize_button.grid(row=0, column=0, columnspan=2, pady=10)
+
+        # Results display area
+        self.optimize_results_text = scrolledtext.ScrolledText(frame, wrap=tk.WORD, height=20)
+        self.optimize_results_text.grid(row=1, column=0, columnspan=2, sticky="nsew", padx=5, pady=5)
+
+        frame.rowconfigure(1, weight=1)
+        frame.columnconfigure(1, weight=1)
+        
+    def run_greedy_optimization(self):
+        # List of documents
+        doc_files = [f for f in os.listdir("documents") if f.endswith(".txt")]
+        if len(doc_files) < 2:
+            messagebox.showinfo("Not Enough Docs", "At least two documents are required for comparison.")
+            return
+
+        # Create loading popup
+        self.loading_popup = tk.Toplevel(self.master)
+        self.loading_popup.title("Processing")
+        self.loading_popup.geometry("300x100")
+
+        label = ttk.Label(self.loading_popup, text="Prioritization in progress, please wait...", font=("Arial", 10))
+        label.pack(pady=20)
+        
+        # Center the popup
+        self.center_window(self.loading_popup, 300, 100)
+
+        # Disable main window interaction while popup is open
+        self.loading_popup.transient(self.master)
+        self.loading_popup.grab_set()
+
+        # Run actual work after short delay to allow UI update
+        self.master.after(100, lambda: self._perform_optimization(doc_files))
+    
+    def _perform_optimization(self, doc_files):
+        doc_paths = [os.path.join("documents", f) for f in doc_files]
+        doc_texts = []
+
+        try:
+            for path in doc_paths:
+                with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+                    doc_texts.append(f.read())
+        except Exception as e:
+            messagebox.showerror("File Error", f"Error reading files: {e}")
+            self.loading_popup.destroy()
+            return
+
+        match_counts = []
+        for i in range(len(doc_texts)):
+            for j in range(i + 1, len(doc_texts)):
+                phrase_matches = detect_plagiarized_phrases(doc_texts[i], doc_texts[j], phrase_length=7)
+                match_count = len(phrase_matches)
+                if match_count > 0:
+                    match_counts.append((doc_files[i], doc_files[j], match_count))
+
+        # Sort descending by match count
+        match_counts.sort(key=lambda x: x[2], reverse=True)
+
+        # Clear results area
+        self.optimize_results_text.delete('1.0', tk.END)
+
+        # Display result
+        if not match_counts:
+            self.optimize_results_text.insert(tk.END, "No overlaps detected among documents.\n")
+        else:
+            self.optimize_results_text.insert(tk.END, "Top Document Pairs by Overlap Count:\n\n")
+            for d1, d2, count in match_counts:
+                self.optimize_results_text.insert(tk.END, f"{d1} ↔ {d2}\nMatches Found: {count}\n------------------------------\n")
+
+        # Close loading popup
+        self.loading_popup.destroy()
 
 if __name__ == "__main__":
     root = tk.Tk()
