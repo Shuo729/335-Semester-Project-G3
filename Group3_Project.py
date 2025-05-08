@@ -7,6 +7,7 @@ from datetime import datetime # For calculating original size of compressed data
 
 # Project module imports
 from string_matching.str_matcher import detect_plagiarized_phrases, merge_overlapping_phrases
+from string_matching.naive_search import naive_search
 from compression.huffman_encoding import compress_phrases
 from sorting.merge_sort import load_documents as load_docs_for_sorting, merge_sort
 from sorting.counting_sort import counting_sort_by_year
@@ -103,6 +104,19 @@ class DocumentScannerGUI:
 
         frame.columnconfigure(1, weight=1)
         frame.rowconfigure(4, weight=1)
+        
+        # Real-Time Keyword Search Section
+        ttk.Label(frame, text="Real-Time Keyword Search (Naive Search):").grid(
+            row=7, column=0, padx=5, pady=(10, 0), sticky="w")
+
+        self.keyword_entry = ttk.Entry(frame, width=40)
+        self.keyword_entry.grid(row=8, column=0, padx=5, pady=5, sticky="w")
+
+        self.keyword_button = ttk.Button(frame, text="Search Keyword in Document 1", command=self.run_naive_keyword_search)
+        self.keyword_button.grid(row=8, column=1, padx=5, pady=5)
+
+        self.keyword_results_text = scrolledtext.ScrolledText(frame, wrap=tk.WORD, height=5)
+        self.keyword_results_text.grid(row=9, column=0, columnspan=3, sticky="nsew", padx=5, pady=5)
 
     def analyze_plagiarism_and_compress(self):
         doc1_path = self.plag_doc1_entry.get()
@@ -250,6 +264,41 @@ class DocumentScannerGUI:
         else:
             self.plag_results_text.insert(tk.END, "No phrases to compress.\n")
 
+    # Perform naive keyword search in Document 1
+    def run_naive_keyword_search(self):
+        doc1_path = self.plag_doc1_entry.get()
+        keyword = self.keyword_entry.get().strip()
+
+        if not os.path.isfile(doc1_path):
+            messagebox.showerror("Error", "Please select a valid document.")
+            return
+        if not keyword:
+            messagebox.showwarning("Input Missing", "Please enter a keyword or phrase to search.")
+            return
+
+        try:
+            with open(doc1_path, 'r', encoding='utf-8', errors='ignore') as f:
+                doc1_text = f.read()
+
+            # Run naive search
+            positions = naive_search(doc1_text, keyword)
+
+            self.keyword_results_text.delete('1.0', tk.END)
+            if not positions:
+                self.keyword_results_text.insert(tk.END, f"'{keyword}' not found.\n")
+            else:
+                self.keyword_results_text.insert(tk.END, f"Found '{keyword}' at positions:\n")
+                for pos in positions:
+                    self.keyword_results_text.insert(tk.END, f"{pos}, ")
+                self.keyword_results_text.insert(tk.END, "\n\nMatches:\n")
+                CONTEXT = 50
+                for pos in positions[:10]:  # Show up to 10 context snippets
+                    start = max(0, pos - CONTEXT)
+                    end = min(len(doc1_text), pos + len(keyword) + CONTEXT)
+                    snippet = doc1_text[start:end]
+                    self.keyword_results_text.insert(tk.END, f"...{snippet}...\n")
+        except Exception as e:
+            messagebox.showerror("Search Error", f"Error during search: {e}")
 
     # --- Document Sorting Tab ---
     def setup_sorting_tab(self, tab):
